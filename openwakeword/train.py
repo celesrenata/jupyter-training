@@ -678,7 +678,8 @@ if __name__ == '__main__':
                 batch_size=config["tts_batch_size"],
                 noise_scales=[0.98], noise_scale_ws=[0.98], length_scales=[0.75, 1.0, 1.25],
                 output_dir=positive_train_output_dir, auto_reduce_batch_size=True,
-                file_names=[uuid.uuid4().hex + ".wav" for i in range(config["n_samples"])]
+                file_names=[uuid.uuid4().hex + ".wav" for i in range(config["n_samples"])],
+                model=config.get("piper_model_path", "./piper-sample-generator/models/en_US-libritts_r-medium.pt")
             )
             torch.cuda.empty_cache()
         else:
@@ -694,7 +695,8 @@ if __name__ == '__main__':
                              batch_size=config["tts_batch_size"],
                              noise_scales=[1.0], noise_scale_ws=[1.0], length_scales=[0.75, 1.0, 1.25],
                              output_dir=positive_test_output_dir, auto_reduce_batch_size=True)
-            torch.cuda.empty_cache()
+            torch.cuda.empty_cache(,
+                             model=config.get("piper_model_path", "./piper-sample-generator/models/en_US-libritts_r-medium.pt"))
         else:
             logging.warning(f"Skipping generation of positive clips testing, as ~{config['n_samples_val']} already exist")
 
@@ -717,7 +719,8 @@ if __name__ == '__main__':
                              output_dir=negative_train_output_dir, auto_reduce_batch_size=True,
                              file_names=[uuid.uuid4().hex + ".wav" for i in range(config["n_samples"])]
                              )
-            torch.cuda.empty_cache()
+            torch.cuda.empty_cache(),
+                             model=config.get("piper_model_path", "./piper-sample-generator/models/en_US-libritts_r-medium.pt")
         else:
             logging.warning(f"Skipping generation of negative clips for training, as ~{config['n_samples']} already exist")
 
@@ -744,7 +747,8 @@ if __name__ == '__main__':
 
     # Set the total length of the training clips based on the ~median generated clip duration, rounding to the nearest 1000 samples
     # and setting to 32000 when the median + 750 ms is close to that, as it's a good default value
-    n = 50  # sample size
+    n = 50  # sample size,
+                             model=config.get("piper_model_path", "./piper-sample-generator/models/en_US-libritts_r-medium.pt"))
     positive_clips = [str(i) for i in Path(positive_test_output_dir).glob("*.wav")]
     duration_in_samples = []
     for i in range(n):

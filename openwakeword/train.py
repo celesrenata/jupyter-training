@@ -827,7 +827,8 @@ if __name__ == '__main__':
         input_shape = np.load(os.path.join(feature_save_dir, "positive_features_test.npy")).shape[1:]
 
         oww = Model(n_classes=1, input_shape=input_shape, model_type=config["model_type"],
-                    layer_dim=config["layer_size"], seconds_per_example=1280*input_shape[0]/16000)
+                    layer_dim=config["layer_size"], n_blocks=config.get("n_blocks", 1),
+                    seconds_per_example=1280*input_shape[0]/16000)
 
         # Create data transform function for batch generation to handle differ clip lengths (todo: write tests for this)
         def f(x, n=input_shape[0]):

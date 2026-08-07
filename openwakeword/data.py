@@ -691,6 +691,11 @@ def augment_clips(
         # Do reverberation
         if augmentation_probabilities["RIR"] >= np.random.random() and RIR_paths != []:
             rir_waveform, sr = torchaudio.load(random.choice(RIR_paths))
+            if rir_waveform.shape[0] > 1:
+                rir_waveform = rir_waveform.mean(dim=0, keepdim=True)
+            if sr != 16000:
+                rir_waveform = torchaudio.functional.resample(rir_waveform, sr, 16000)
+                sr = 16000
             augmented_batch = reverberate(augmented_batch.cpu(), rir_waveform, rescale_amp="avg")
 
         # yield batch of 16-bit PCM audio data
@@ -926,7 +931,7 @@ def generate_adversarial_texts(input_text: str, N: int, include_partial_phrase: 
     if [] in input_text_phones:
         phonemizer_mdl_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "resources", "en_us_cmudict_forward.pt")
         if not os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), "resources")):
-            os.mkdir(os.path.join(os.path.dirname(os.path.abspath(__file__)), "resources"))
+            os.makedirs(os.path.join(os.path.dirname(os.path.abspath(__file__)), "resources"), exist_ok=True)
         if not os.path.exists(phonemizer_mdl_path):
             logging.warning("Downloading phonemizer model from DeepPhonemizer library...")
             import requests

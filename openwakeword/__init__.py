@@ -1,4 +1,5 @@
 import os
+__version__ = "0.5.1"
 from openwakeword.model import Model
 from openwakeword.vad import VAD
 from openwakeword.custom_verifier_model import train_custom_verifier
